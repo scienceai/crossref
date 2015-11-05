@@ -15,10 +15,11 @@ var _lodashObjectAssign = require('lodash/object/assign');
 var _lodashObjectAssign2 = _interopRequireDefault(_lodashObjectAssign);
 
 var endpoint = 'http://api.crossref.org/';
+var timeout = 60 * 1000; // crossref is *very* slow
 
 // make a request
 function GET(path, cb) {
-  (0, _got2['default'])('' + endpoint + path, { json: true }, function (err, body, res) {
+  (0, _got2['default'])('' + endpoint + path, { json: true, timeout: timeout }, function (err, body, res) {
     if (err) {
       if (err.statusCode === 404) return cb(new Error('Not found on Crossref: \'' + endpoint + path + '\''));
       return cb(new Error('Crossref error: [' + err.statusCode + '] ' + err.message));
@@ -59,10 +60,19 @@ function listRequest(path, options, cb) {
     if (err) return cb(err);
     var objects = msg.items;
     delete msg.items;
-    var nextOffset = msg.query['start-index'] + msg['items-per-page'];
+    var nextOffset = 0;
     var isDone = false;
-    if (nextOffset > msg['total-results']) isDone = true;
-    var nextOptions = (0, _lodashObjectAssign2['default'])({}, options, { offset: nextOffset });
+    var nextOptions = undefined;
+    // /types is a list but it does not behave like the other lists
+    // Once again the science.ai League of JStice saves the day papering over inconsistency!
+    if (msg['items-per-page'] && msg.query) {
+      nextOffset = msg.query['start-index'] + msg['items-per-page'];
+      if (nextOffset > msg['total-results']) isDone = true;
+      nextOptions = (0, _lodashObjectAssign2['default'])({}, options, { offset: nextOffset });
+    } else {
+      isDone = true;
+      nextOptions = (0, _lodashObjectAssign2['default'])({}, options);
+    }
     cb(null, objects, nextOptions, isDone, msg);
   });
 }
