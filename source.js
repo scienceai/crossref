@@ -40,7 +40,7 @@ function listRequest (path, options, cb) {
       for (let f in options.filter) {
         filts.push(`${f}:${options.filter[f]}`);
       }
-      opts.push(filts.join(','));
+      opts.push(`filter=${filts.join(',')}`);
     }
     else if (k === 'facet' && options.facet) opts.push('facet=t');
     else opts.push(`${k}=${options[k]}`);
@@ -54,7 +54,7 @@ function listRequest (path, options, cb) {
     let isDone = false;
     if (nextOffset > msg['total-results']) isDone = true;
     let nextOptions = assign({}, options, { offset: nextOffset });
-    cb(null, objects, nextOptions, isDone);
+    cb(null, objects, nextOptions, isDone, msg);
   });
 }
 

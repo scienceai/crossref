@@ -51,7 +51,7 @@ function listRequest(path, options, cb) {
       for (var f in options.filter) {
         filts.push(f + ':' + options.filter[f]);
       }
-      opts.push(filts.join(','));
+      opts.push('filter=' + filts.join(','));
     } else if (k === 'facet' && options.facet) opts.push('facet=t');else opts.push(k + '=' + options[k]);
   }
   if (opts.length) path += '?' + opts.join('&');
@@ -63,7 +63,7 @@ function listRequest(path, options, cb) {
     var isDone = false;
     if (nextOffset > msg['total-results']) isDone = true;
     var nextOptions = (0, _lodashObjectAssign2['default'])({}, options, { offset: nextOffset });
-    cb(null, objects, nextOptions, isDone);
+    cb(null, objects, nextOptions, isDone, msg);
   });
 }
 
