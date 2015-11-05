@@ -7,6 +7,7 @@ const timeout = 60 * 1000; // crossref is *very* slow
 
 // make a request
 function GET (path, cb) {
+  // console.log(`### ${endpoint}${path}`);
   got(`${endpoint}${path}`, { json: true, timeout }, (err, body, res) => {
     if (err) {
       if (err.statusCode === 404) return cb(new Error(`Not found on Crossref: '${endpoint}${path}'`));
@@ -27,7 +28,7 @@ function item (urlTmpl) {
 }
 
 // backend for list requests
-function listRequest (path, options, cb) {
+function listRequest (path, options = {}, cb) {
   if (typeof options === 'function') {
     cb = options;
     options = {};
@@ -100,10 +101,10 @@ export let journal  = item('journals/{param}');
 // /prefixes/{owner_prefix}/works 	returns list of works associated with specified owner_prefix
 // /members/{member_id}/works 	returns list of works associated with a CrossRef member (deposited by a CrossRef member)
 // /journals/{issn}/works 	returns a list of works in the given journal
-export let funderWork   = itemList('funders/{param}');
-export let prefixWork   = itemList('prefixes/{param}');
-export let memberWork   = itemList('members/{param}');
-export let journalWork  = itemList('journals/{param}');
+export let funderWorks  = itemList('funders/{param}/works');
+export let prefixWorks  = itemList('prefixes/{param}/works');
+export let memberWorks  = itemList('members/{param}/works');
+export let journalWorks = itemList('journals/{param}/works');
 
 // /works 	returns a list of all works (journal articles, conference proceedings, books, components, etc), 20 per page
 // /funders 	returns a list of all funders in the FundRef Registry
@@ -126,10 +127,10 @@ const Crossref = {
   member,
   type,
   journal,
-  funderWork,
-  prefixWork,
-  memberWork,
-  journalWork,
+  funderWorks,
+  prefixWorks,
+  memberWorks,
+  journalWorks,
   works,
   funders,
   members,

@@ -19,6 +19,7 @@ var timeout = 60 * 1000; // crossref is *very* slow
 
 // make a request
 function GET(path, cb) {
+  // console.log(`### ${endpoint}${path}`);
   (0, _got2['default'])('' + endpoint + path, { json: true, timeout: timeout }, function (err, body, res) {
     if (err) {
       if (err.statusCode === 404) return cb(new Error('Not found on Crossref: \'' + endpoint + path + '\''));
@@ -40,6 +41,8 @@ function item(urlTmpl) {
 
 // backend for list requests
 function listRequest(path, options, cb) {
+  if (options === undefined) options = {};
+
   if (typeof options === 'function') {
     cb = options;
     options = {};
@@ -114,15 +117,15 @@ exports.journal = journal;
 // /prefixes/{owner_prefix}/works 	returns list of works associated with specified owner_prefix
 // /members/{member_id}/works 	returns list of works associated with a CrossRef member (deposited by a CrossRef member)
 // /journals/{issn}/works 	returns a list of works in the given journal
-var funderWork = itemList('funders/{param}');
-exports.funderWork = funderWork;
-var prefixWork = itemList('prefixes/{param}');
-exports.prefixWork = prefixWork;
-var memberWork = itemList('members/{param}');
-exports.memberWork = memberWork;
-var journalWork = itemList('journals/{param}');
+var funderWorks = itemList('funders/{param}/works');
+exports.funderWorks = funderWorks;
+var prefixWorks = itemList('prefixes/{param}/works');
+exports.prefixWorks = prefixWorks;
+var memberWorks = itemList('members/{param}/works');
+exports.memberWorks = memberWorks;
+var journalWorks = itemList('journals/{param}/works');
 
-exports.journalWork = journalWork;
+exports.journalWorks = journalWorks;
 // /works 	returns a list of all works (journal articles, conference proceedings, books, components, etc), 20 per page
 // /funders 	returns a list of all funders in the FundRef Registry
 // /members 	returns a list of all CrossRef members (mostly publishers)
@@ -150,10 +153,10 @@ var Crossref = {
   member: member,
   type: type,
   journal: journal,
-  funderWork: funderWork,
-  prefixWork: prefixWork,
-  memberWork: memberWork,
-  journalWork: journalWork,
+  funderWorks: funderWorks,
+  prefixWorks: prefixWorks,
+  memberWorks: memberWorks,
+  journalWorks: journalWorks,
   works: works,
   funders: funders,
   members: members,
