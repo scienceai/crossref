@@ -1,5 +1,5 @@
 
-import got from 'got';
+import request from 'request';
 import assign from 'lodash/object/assign';
 
 const endpoint = 'http://api.crossref.org/';
@@ -8,7 +8,7 @@ const timeout = 60 * 1000; // CrossRef is *very* slow
 // make a request
 function GET (path, cb) {
   // console.log(`### ${endpoint}${path}`);
-  got(`${endpoint}${path}`, { json: true, timeout }, (err, body, res) => {
+  request(`${endpoint}${path}`, { json: true, timeout }, (err, res, body) => {
     if (err) {
       if (err.statusCode === 404) return cb(new Error(`Not found on CrossRef: '${endpoint}${path}'`));
       return cb(new Error(`CrossRef error: [${err.statusCode}] ${err.message}`));

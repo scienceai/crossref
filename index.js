@@ -6,9 +6,9 @@ Object.defineProperty(exports, '__esModule', {
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
-var _got = require('got');
+var _request = require('request');
 
-var _got2 = _interopRequireDefault(_got);
+var _request2 = _interopRequireDefault(_request);
 
 var _lodashObjectAssign = require('lodash/object/assign');
 
@@ -20,7 +20,7 @@ var timeout = 60 * 1000; // CrossRef is *very* slow
 // make a request
 function GET(path, cb) {
   // console.log(`### ${endpoint}${path}`);
-  (0, _got2['default'])('' + endpoint + path, { json: true, timeout: timeout }, function (err, body, res) {
+  (0, _request2['default'])('' + endpoint + path, { json: true, timeout: timeout }, function (err, res, body) {
     if (err) {
       if (err.statusCode === 404) return cb(new Error('Not found on CrossRef: \'' + endpoint + path + '\''));
       return cb(new Error('CrossRef error: [' + err.statusCode + '] ' + err.message));
