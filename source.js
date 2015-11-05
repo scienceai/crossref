@@ -3,19 +3,19 @@ import got from 'got';
 import assign from 'lodash/object/assign';
 
 const endpoint = 'http://api.crossref.org/';
-const timeout = 60 * 1000; // crossref is *very* slow
+const timeout = 60 * 1000; // CrossRef is *very* slow
 
 // make a request
 function GET (path, cb) {
   // console.log(`### ${endpoint}${path}`);
   got(`${endpoint}${path}`, { json: true, timeout }, (err, body, res) => {
     if (err) {
-      if (err.statusCode === 404) return cb(new Error(`Not found on Crossref: '${endpoint}${path}'`));
-      return cb(new Error(`Crossref error: [${err.statusCode}] ${err.message}`));
+      if (err.statusCode === 404) return cb(new Error(`Not found on CrossRef: '${endpoint}${path}'`));
+      return cb(new Error(`CrossRef error: [${err.statusCode}] ${err.message}`));
     }
-    if (typeof body !== 'object') return cb(new Error(`Crossref response was not JSON: ${body}`));
-    if (!body.status) return cb(new Error('Malformed Crossref response: no `status` field.'));
-    if (body.status !== 'ok') return cb(new Error(`Crossref error: ${body.status}`));
+    if (typeof body !== 'object') return cb(new Error(`CrossRef response was not JSON: ${body}`));
+    if (!body.status) return cb(new Error('Malformed CrossRef response: no `status` field.'));
+    if (body.status !== 'ok') return cb(new Error(`CrossRef error: ${body.status}`));
     cb(null, body.message);
   });
 }
@@ -40,7 +40,14 @@ function listRequest (path, options = {}, cb) {
     else if (k === 'filter') {
       let filts = [];
       for (let f in options.filter) {
-        filts.push(`${f}:${options.filter[f]}`);
+        if (Array.isArray(options.filter[f])) {
+          options.filter[f].forEach(val => {
+            filts.push(`${f}:${val}`);
+          });
+        }
+        else {
+          filts.push(`${f}:${options.filter[f]}`);
+        }
       }
       opts.push(`filter=${filts.join(',')}`);
     }
@@ -120,7 +127,7 @@ export let licenses  = list('licenses');
 export let journals  = list('journals');
 
 // everything in one big ball
-const Crossref = {
+const CrossRef = {
   work,
   funder,
   prefix,
@@ -138,4 +145,4 @@ const Crossref = {
   licenses,
   journals
 };
-export default Crossref;
+export default CrossRef;

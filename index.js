@@ -15,19 +15,19 @@ var _lodashObjectAssign = require('lodash/object/assign');
 var _lodashObjectAssign2 = _interopRequireDefault(_lodashObjectAssign);
 
 var endpoint = 'http://api.crossref.org/';
-var timeout = 60 * 1000; // crossref is *very* slow
+var timeout = 60 * 1000; // CrossRef is *very* slow
 
 // make a request
 function GET(path, cb) {
   // console.log(`### ${endpoint}${path}`);
   (0, _got2['default'])('' + endpoint + path, { json: true, timeout: timeout }, function (err, body, res) {
     if (err) {
-      if (err.statusCode === 404) return cb(new Error('Not found on Crossref: \'' + endpoint + path + '\''));
-      return cb(new Error('Crossref error: [' + err.statusCode + '] ' + err.message));
+      if (err.statusCode === 404) return cb(new Error('Not found on CrossRef: \'' + endpoint + path + '\''));
+      return cb(new Error('CrossRef error: [' + err.statusCode + '] ' + err.message));
     }
-    if (typeof body !== 'object') return cb(new Error('Crossref response was not JSON: ' + body));
-    if (!body.status) return cb(new Error('Malformed Crossref response: no `status` field.'));
-    if (body.status !== 'ok') return cb(new Error('Crossref error: ' + body.status));
+    if (typeof body !== 'object') return cb(new Error('CrossRef response was not JSON: ' + body));
+    if (!body.status) return cb(new Error('Malformed CrossRef response: no `status` field.'));
+    if (body.status !== 'ok') return cb(new Error('CrossRef error: ' + body.status));
     cb(null, body.message);
   });
 }
@@ -51,11 +51,24 @@ function listRequest(path, options, cb) {
   var opts = [];
   for (var k in options) {
     if (k === 'query') opts.push('query=' + encodeURIComponent(options.query));else if (k === 'filter') {
-      var filts = [];
-      for (var f in options.filter) {
-        filts.push(f + ':' + options.filter[f]);
-      }
-      opts.push('filter=' + filts.join(','));
+      (function () {
+        var filts = [];
+
+        var _loop = function (f) {
+          if (Array.isArray(options.filter[f])) {
+            options.filter[f].forEach(function (val) {
+              filts.push(f + ':' + val);
+            });
+          } else {
+            filts.push(f + ':' + options.filter[f]);
+          }
+        };
+
+        for (var f in options.filter) {
+          _loop(f);
+        }
+        opts.push('filter=' + filts.join(','));
+      })();
     } else if (k === 'facet' && options.facet) opts.push('facet=t');else opts.push(k + '=' + options[k]);
   }
   if (opts.length) path += '?' + opts.join('&');
@@ -146,7 +159,7 @@ var journals = list('journals');
 
 exports.journals = journals;
 // everything in one big ball
-var Crossref = {
+var CrossRef = {
   work: work,
   funder: funder,
   prefix: prefix,
@@ -164,4 +177,4 @@ var Crossref = {
   licenses: licenses,
   journals: journals
 };
-exports['default'] = Crossref;
+exports['default'] = CrossRef;
