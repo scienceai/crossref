@@ -1,18 +1,21 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.journals = exports.licenses = exports.types = exports.members = exports.funders = exports.works = exports.journalWorks = exports.memberWorks = exports.prefixWorks = exports.funderWorks = exports.journal = exports.type = exports.member = exports.prefix = exports.funder = exports.work = undefined;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 var _request = require('request');
 
 var _request2 = _interopRequireDefault(_request);
 
-var _lodashObjectAssign = require('lodash/object/assign');
+var _assign = require('lodash/assign');
 
-var _lodashObjectAssign2 = _interopRequireDefault(_lodashObjectAssign);
+var _assign2 = _interopRequireDefault(_assign);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var endpoint = 'http://api.crossref.org/';
 var timeout = 60 * 1000; // CrossRef is *very* slow
@@ -20,12 +23,12 @@ var timeout = 60 * 1000; // CrossRef is *very* slow
 // make a request
 function GET(path, cb) {
   // console.log(`### ${endpoint}${path}`);
-  (0, _request2['default'])('' + endpoint + path, { json: true, timeout: timeout }, function (err, res, body) {
+  (0, _request2.default)('' + endpoint + path, { json: true, timeout: timeout }, function (err, res, body) {
     if (err) {
       if (err.statusCode === 404) return cb(new Error('Not found on CrossRef: \'' + endpoint + path + '\''));
       return cb(new Error('CrossRef error: [' + err.statusCode + '] ' + err.message));
     }
-    if (typeof body !== 'object') return cb(new Error('CrossRef response was not JSON: ' + body));
+    if ((typeof body === 'undefined' ? 'undefined' : _typeof(body)) !== 'object') return cb(new Error('CrossRef response was not JSON: ' + body));
     if (!body.status) return cb(new Error('Malformed CrossRef response: no `status` field.'));
     if (body.status !== 'ok') return cb(new Error('CrossRef error: ' + body.status));
     cb(null, body.message);
@@ -40,8 +43,9 @@ function item(urlTmpl) {
 }
 
 // backend for list requests
-function listRequest(path, options, cb) {
-  if (options === undefined) options = {};
+function listRequest(path) {
+  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var cb = arguments[2];
 
   if (typeof options === 'function') {
     cb = options;
@@ -50,11 +54,19 @@ function listRequest(path, options, cb) {
   // serialise options
   var opts = [];
   for (var k in options) {
-    if (k === 'query') opts.push('query=' + encodeURIComponent(options.query));else if (k === 'filter') {
+    // The whole URL *minus* the scheme and "://" (for whatever benighted reason) has to be at most
+    // 4096 characters long. Taking the extra bloat that `encodeURIComponent()` adds we truncate the
+    // query to 3000 chars. We could be more precise and regenerate the URL until we reach as close
+    // as possible to 4096, but frankly if you're searching for a string longer than 3000 characters
+    // you're probably doing something wrong.
+    if (k === 'query') {
+      if (options.query.length > 3000) options.query = options.query.substr(0, 3000);
+      opts.push('query=' + encodeURIComponent(options.query));
+    } else if (k === 'filter') {
       (function () {
         var filts = [];
 
-        var _loop = function (f) {
+        var _loop = function _loop(f) {
           if (Array.isArray(options.filter[f])) {
             options.filter[f].forEach(function (val) {
               filts.push(f + ':' + val);
@@ -84,10 +96,10 @@ function listRequest(path, options, cb) {
     if (msg['items-per-page'] && msg.query) {
       nextOffset = msg.query['start-index'] + msg['items-per-page'];
       if (nextOffset > msg['total-results']) isDone = true;
-      nextOptions = (0, _lodashObjectAssign2['default'])({}, options, { offset: nextOffset });
+      nextOptions = (0, _assign2.default)({}, options, { offset: nextOffset });
     } else {
       isDone = true;
-      nextOptions = (0, _lodashObjectAssign2['default'])({}, options);
+      nextOptions = (0, _assign2.default)({}, options);
     }
     cb(null, objects, nextOptions, isDone, msg);
   });
@@ -112,52 +124,36 @@ function itemList(urlTmpl) {
 // /members/{member_id} 	returns metadata for a CrossRef member
 // /types/{type_id} 	returns information about a metadata work type
 // /journals/{issn} 	returns information about a journal with the given ISSN
-var work = item('works/{param}');
-exports.work = work;
-var funder = item('funders/{param}');
-exports.funder = funder;
-var prefix = item('prefixes/{param}');
-exports.prefix = prefix;
-var member = item('members/{param}');
-exports.member = member;
-var type = item('types/{param}');
-exports.type = type;
-var journal = item('journals/{param}');
+var work = exports.work = item('works/{param}');
+var funder = exports.funder = item('funders/{param}');
+var prefix = exports.prefix = item('prefixes/{param}');
+var member = exports.member = item('members/{param}');
+var type = exports.type = item('types/{param}');
+var journal = exports.journal = item('journals/{param}');
 
-exports.journal = journal;
 // /funders/{funder_id}/works 	returns list of works associated with the specified funder_id
 // /types/{type_id}/works 	returns list of works of type type
 // /prefixes/{owner_prefix}/works 	returns list of works associated with specified owner_prefix
 // /members/{member_id}/works 	returns list of works associated with a CrossRef member (deposited by a CrossRef member)
 // /journals/{issn}/works 	returns a list of works in the given journal
-var funderWorks = itemList('funders/{param}/works');
-exports.funderWorks = funderWorks;
-var prefixWorks = itemList('prefixes/{param}/works');
-exports.prefixWorks = prefixWorks;
-var memberWorks = itemList('members/{param}/works');
-exports.memberWorks = memberWorks;
-var journalWorks = itemList('journals/{param}/works');
+var funderWorks = exports.funderWorks = itemList('funders/{param}/works');
+var prefixWorks = exports.prefixWorks = itemList('prefixes/{param}/works');
+var memberWorks = exports.memberWorks = itemList('members/{param}/works');
+var journalWorks = exports.journalWorks = itemList('journals/{param}/works');
 
-exports.journalWorks = journalWorks;
 // /works 	returns a list of all works (journal articles, conference proceedings, books, components, etc), 20 per page
 // /funders 	returns a list of all funders in the FundRef Registry
 // /members 	returns a list of all CrossRef members (mostly publishers)
 // /types 	returns a list of valid work types
 // /licenses 	return a list of licenses applied to works in CrossRef metadata
 // /journals 	return a list of journals in the CrossRef database
-var works = list('works');
-exports.works = works;
-var funders = list('funders');
-exports.funders = funders;
-var members = list('members');
-exports.members = members;
-var types = list('types');
-exports.types = types;
-var licenses = list('licenses');
-exports.licenses = licenses;
-var journals = list('journals');
+var works = exports.works = list('works');
+var funders = exports.funders = list('funders');
+var members = exports.members = list('members');
+var types = exports.types = list('types');
+var licenses = exports.licenses = list('licenses');
+var journals = exports.journals = list('journals');
 
-exports.journals = journals;
 // everything in one big ball
 var CrossRef = {
   work: work,
@@ -177,4 +173,4 @@ var CrossRef = {
   licenses: licenses,
   journals: journals
 };
-exports['default'] = CrossRef;
+exports.default = CrossRef;

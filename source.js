@@ -1,6 +1,6 @@
 
 import request from 'request';
-import assign from 'lodash/object/assign';
+import assign from 'lodash/assign';
 
 const endpoint = 'http://api.crossref.org/';
 const timeout = 60 * 1000; // CrossRef is *very* slow
@@ -36,7 +36,15 @@ function listRequest (path, options = {}, cb) {
   // serialise options
   let opts = [];
   for (let k in options) {
-    if (k === 'query') opts.push(`query=${encodeURIComponent(options.query)}`);
+    // The whole URL *minus* the scheme and "://" (for whatever benighted reason) has to be at most
+    // 4096 characters long. Taking the extra bloat that `encodeURIComponent()` adds we truncate the
+    // query to 3000 chars. We could be more precise and regenerate the URL until we reach as close
+    // as possible to 4096, but frankly if you're searching for a string longer than 3000 characters
+    // you're probably doing something wrong.
+    if (k === 'query') {
+      if (options.query.length > 3000) options.query = options.query.substr(0, 3000);
+      opts.push(`query=${encodeURIComponent(options.query)}`);
+    }
     else if (k === 'filter') {
       let filts = [];
       for (let f in options.filter) {
