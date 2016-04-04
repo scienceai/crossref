@@ -38,11 +38,11 @@ function listRequest (path, options = {}, cb) {
   for (let k in options) {
     // The whole URL *minus* the scheme and "://" (for whatever benighted reason) has to be at most
     // 4096 characters long. Taking the extra bloat that `encodeURIComponent()` adds we truncate the
-    // query to 3000 chars. We could be more precise and regenerate the URL until we reach as close
-    // as possible to 4096, but frankly if you're searching for a string longer than 3000 characters
+    // query to 2000 chars. We could be more precise and regenerate the URL until we reach as close
+    // as possible to 4096, but frankly if you're searching for a string longer than 2000 characters
     // you're probably doing something wrong.
     if (k === 'query') {
-      if (options.query.length > 3000) options.query = options.query.substr(0, 3000);
+      if (options.query.length > 2000) options.query = options.query.substr(0, 2000);
       opts.push(`query=${encodeURIComponent(options.query)}`);
     }
     else if (k === 'filter') {
