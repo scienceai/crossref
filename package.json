@@ -4,13 +4,14 @@
   "description": "Client library for the Crossref API",
   "main": "index.js",
   "scripts": {
-    "build-browser": "browserify crossref.js -o 'uglifyjs - -c warnings=false -m > crossref.min.js'",
+    "build-browser": "browserify crossref.js | uglifyjs - -c warnings=false -m > crossref.min.js",
     "build-node": "babel --presets es2015 source.js --out-file index.js",
     "build": "npm run build-node && npm run build-browser",
     "watch-browser": "watchify crossref.js --verbose --ignore-watch=\"**/node_modules/**\" --ignore-watch=\"index.js\" -o 'uglifyjs - -c warnings=false -m > crossref.min.js'",
     "watch-node": "babel -w --presets es2015 source.js --out-file index.js",
     "watch": "concurrently --kill-others --prefix command 'npm run watch-node' 'npm run watch-browser'",
-    "test": "ava"
+    "test": "ava",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
