@@ -24,9 +24,9 @@ var timeout = 60 * 1000; // CrossRef is *very* slow
 function GET(path, cb) {
   // console.log(`### ${endpoint}${path}`);
   (0, _request2.default)('' + endpoint + path, { json: true, timeout: timeout }, function (err, res, body) {
-    if (err) {
-      if (err.statusCode === 404) return cb(new Error('Not found on CrossRef: \'' + endpoint + path + '\''));
-      return cb(new Error('CrossRef error: [' + err.statusCode + '] ' + err.message));
+    if (err || res.statusCode >= 400) {
+      if (res.statusCode === 404) return cb(new Error('Not found on CrossRef: \'' + endpoint + path + '\''));
+      return cb(new Error('CrossRef error: [' + res.statusCode + '] ' + (err && err.message ? err.message : res.statusMessage)));
     }
     if ((typeof body === 'undefined' ? 'undefined' : _typeof(body)) !== 'object') return cb(new Error('CrossRef response was not JSON: ' + body));
     if (!body.status) return cb(new Error('Malformed CrossRef response: no `status` field.'));
