@@ -10,8 +10,11 @@ function GET (path, cb) {
   // console.log(`### ${endpoint}${path}`);
   request(`${endpoint}${path}`, { json: true, timeout }, (err, res, body) => {
     if (err || res.statusCode >= 400) {
-      if (res.statusCode === 404) return cb(new Error(`Not found on CrossRef: '${endpoint}${path}'`));
-      return cb(new Error(`CrossRef error: [${res.statusCode}] ${(err && err.message) ? err.message : res.statusMessage}`));
+      let statusCode = res ? res.statusCode : 0
+        , statusMessage = res ? res.statusMessage : 'Unspecified error (likely a timeout)'
+      ;
+      if (statusCode === 404) return cb(new Error(`Not found on CrossRef: '${endpoint}${path}'`));
+      return cb(new Error(`CrossRef error: [${statusCode}] ${(err && err.message) ? err.message : res.statusMessage}`));
     }
     if (typeof body !== 'object') return cb(new Error(`CrossRef response was not JSON: ${body}`));
     if (!body.status) return cb(new Error('Malformed CrossRef response: no `status` field.'));
