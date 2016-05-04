@@ -9,7 +9,7 @@ const timeout = 60 * 1000; // CrossRef is *very* slow
 function GET (path, cb) {
   // console.log(`### ${endpoint}${path}`);
   request(`${endpoint}${path}`, { json: true, timeout }, (err, res, body) => {
-    if (err || res.statusCode >= 400) {
+    if (err || !res || res.statusCode >= 400) {
       let statusCode = res ? res.statusCode : 0
         , statusMessage = res ? res.statusMessage : 'Unspecified error (likely a timeout)'
       ;
