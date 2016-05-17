@@ -14,7 +14,8 @@ function GET (path, cb) {
         , statusMessage = res ? res.statusMessage : 'Unspecified error (likely a timeout)'
       ;
       if (statusCode === 404) return cb(new Error(`Not found on CrossRef: '${endpoint}${path}'`));
-      return cb(new Error(`CrossRef error: [${statusCode}] ${(err && err.message) ? err.message : res.statusMessage}`));
+      let msg = (err && err.message) ? err.message : statusMessage;
+      return cb(new Error(`CrossRef error: [${statusCode}] ${msg}`));
     }
     if (typeof body !== 'object') return cb(new Error(`CrossRef response was not JSON: ${body}`));
     if (!body.status) return cb(new Error('Malformed CrossRef response: no `status` field.'));
@@ -25,9 +26,7 @@ function GET (path, cb) {
 
 // make a method that just returns the one item
 function item (urlTmpl) {
-  return (param, cb) => {
-    return GET(urlTmpl.replace('{param}', param), cb);
-  };
+  return (param, cb) => GET(urlTmpl.replace('{param}', param), cb);
 }
 
 // backend for list requests
@@ -90,14 +89,10 @@ function listRequest (path, options = {}, cb) {
 
 // make a method that returns a list that can be
 function list (path) {
-  return (options, cb) => {
-    return listRequest(path, options, cb);
-  };
+  return (options, cb) => listRequest(path, options, cb);
 }
 function itemList (urlTmpl) {
-  return (param, options, cb) => {
-    return listRequest(urlTmpl.replace('{param}', param), options, cb);
-  };
+  return (param, options, cb) => listRequest(urlTmpl.replace('{param}', param), options, cb);
 }
 
 // Actual API
@@ -117,14 +112,16 @@ export let journal  = item('journals/{param}');
 // /funders/{funder_id}/works 	returns list of works associated with the specified funder_id
 // /types/{type_id}/works 	returns list of works of type type
 // /prefixes/{owner_prefix}/works 	returns list of works associated with specified owner_prefix
-// /members/{member_id}/works 	returns list of works associated with a CrossRef member (deposited by a CrossRef member)
+// /members/{member_id}/works 	returns list of works associated with a CrossRef member
+//                                  (deposited by a CrossRef member)
 // /journals/{issn}/works 	returns a list of works in the given journal
 export let funderWorks  = itemList('funders/{param}/works');
 export let prefixWorks  = itemList('prefixes/{param}/works');
 export let memberWorks  = itemList('members/{param}/works');
 export let journalWorks = itemList('journals/{param}/works');
 
-// /works 	returns a list of all works (journal articles, conference proceedings, books, components, etc), 20 per page
+// /works 	returns a list of all works (journal articles, conference proceedings, books,
+//                components, etc), 20 per page
 // /funders 	returns a list of all funders in the FundRef Registry
 // /members 	returns a list of all CrossRef members (mostly publishers)
 // /types 	returns a list of valid work types
@@ -154,6 +151,6 @@ const CrossRef = {
   members,
   types,
   licenses,
-  journals
+  journals,
 };
 export default CrossRef;
