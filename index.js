@@ -17,7 +17,7 @@ var _assign2 = _interopRequireDefault(_assign);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var endpoint = 'http://api.crossref.org/';
+var endpoint = 'https://api.crossref.org/';
 var timeout = 60 * 1000; // CrossRef is *very* slow
 
 // make a request
@@ -47,7 +47,7 @@ function item(urlTmpl) {
 
 // backend for list requests
 function listRequest(path) {
-  var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   var cb = arguments[2];
 
   if (typeof options === 'function') {
