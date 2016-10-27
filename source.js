@@ -2,7 +2,7 @@
 import request from 'request';
 import assign from 'lodash/assign';
 
-const endpoint = 'http://api.crossref.org/';
+const endpoint = 'https://api.crossref.org/';
 const timeout = 60 * 1000; // CrossRef is *very* slow
 
 // make a request
