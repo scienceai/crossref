@@ -10,13 +10,15 @@ function GET (path, cb) {
   // console.log(`### ${endpoint}${path}`);
   request({ url: `${endpoint}${path}`, json: true, timeout }, (err, res, body) => {
     if (err || !res || res.statusCode >= 400) {
-      let statusCode = res ? res.statusCode : 0;
-      let statusMessage = res ? res.statusMessage : 'Unspecified error (likely a timeout)';
+      let statusCode = res ? res.statusCode : 0
+        , statusMessage = res ? res.statusMessage : 'Unspecified error (likely a timeout)'
+      ;
 
       if (statusCode === 429) {
-        let headers  = res.headers || {};
-        let limit    = headers['x-rate-limit-limit'] || 'N/A';
-        let interval = headers['x-rate-limit-interval'] || 'N/A';
+        let headers = res.headers || {}
+          , limit = headers['x-rate-limit-limit'] || 'N/A'
+          , interval = headers['x-rate-limit-interval'] || 'N/A'
+        ;
         return cb(new Error(`Rate limit exceeded: ${limit} requests in ${interval}`));
       }
       if (statusCode === 404) return cb(new Error(`Not found on CrossRef: '${endpoint}${path}'`));
