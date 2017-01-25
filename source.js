@@ -77,9 +77,10 @@ function listRequest (path, options = {}, cb) {
     if (err) return cb(err);
     let objects = msg.items;
     delete msg.items;
-    let nextOffset = 0;
-    let isDone = false;
-    let nextOptions;
+    let nextOffset = 0
+      , isDone = false
+      , nextOptions
+    ;
     // /types is a list but it does not behave like the other lists
     // Once again the science.ai League of JStice saves the day papering over inconsistency!
     if (msg['items-per-page'] && msg.query) {
@@ -104,43 +105,43 @@ function itemList (urlTmpl) {
 }
 
 // Actual API
-// /works/{doi} 	returns metadata for the specified CrossRef DOI.
-// /funders/{funder_id} 	returns metadata for specified funder and its suborganizations
-// /prefixes/{owner_prefix} 	returns metadata for the DOI owner prefix
-// /members/{member_id} 	returns metadata for a CrossRef member
-// /types/{type_id} 	returns information about a metadata work type
-// /journals/{issn} 	returns information about a journal with the given ISSN
-export let work     = item('works/{param}');
-export let funder   = item('funders/{param}');
-export let prefix   = item('prefixes/{param}');
-export let member   = item('members/{param}');
-export let type     = item('types/{param}');
-export let journal  = item('journals/{param}');
+// /works/{doi} returns metadata for the specified CrossRef DOI.
+// /funders/{funder_id} returns metadata for specified funder and its suborganizations
+// /prefixes/{owner_prefix} returns metadata for the DOI owner prefix
+// /members/{member_id} returns metadata for a CrossRef member
+// /types/{type_id} returns information about a metadata work type
+// /journals/{issn} returns information about a journal with the given ISSN
+export const work     = item('works/{param}');
+export const funder   = item('funders/{param}');
+export const prefix   = item('prefixes/{param}');
+export const member   = item('members/{param}');
+export const type     = item('types/{param}');
+export const journal  = item('journals/{param}');
 
-// /funders/{funder_id}/works 	returns list of works associated with the specified funder_id
-// /types/{type_id}/works 	returns list of works of type type
-// /prefixes/{owner_prefix}/works 	returns list of works associated with specified owner_prefix
-// /members/{member_id}/works 	returns list of works associated with a CrossRef member
+// /funders/{funder_id}/works   returns list of works associated with the specified funder_id
+// /types/{type_id}/works   returns list of works of type type
+// /prefixes/{owner_prefix}/works   returns list of works associated with specified owner_prefix
+// /members/{member_id}/works   returns list of works associated with a CrossRef member
 //                                  (deposited by a CrossRef member)
-// /journals/{issn}/works 	returns a list of works in the given journal
-export let funderWorks  = itemList('funders/{param}/works');
-export let prefixWorks  = itemList('prefixes/{param}/works');
-export let memberWorks  = itemList('members/{param}/works');
-export let journalWorks = itemList('journals/{param}/works');
+// /journals/{issn}/works   returns a list of works in the given journal
+export const funderWorks  = itemList('funders/{param}/works');
+export const prefixWorks  = itemList('prefixes/{param}/works');
+export const memberWorks  = itemList('members/{param}/works');
+export const journalWorks = itemList('journals/{param}/works');
 
-// /works 	returns a list of all works (journal articles, conference proceedings, books,
+// /works   returns a list of all works (journal articles, conference proceedings, books,
 //                components, etc), 20 per page
-// /funders 	returns a list of all funders in the FundRef Registry
-// /members 	returns a list of all CrossRef members (mostly publishers)
-// /types 	returns a list of valid work types
-// /licenses 	return a list of licenses applied to works in CrossRef metadata
-// /journals 	return a list of journals in the CrossRef database
-export let works     = list('works');
-export let funders   = list('funders');
-export let members   = list('members');
-export let types     = list('types');
-export let licenses  = list('licenses');
-export let journals  = list('journals');
+// /funders   returns a list of all funders in the FundRef Registry
+// /members   returns a list of all CrossRef members (mostly publishers)
+// /types   returns a list of valid work types
+// /licenses   return a list of licenses applied to works in CrossRef metadata
+// /journals   return a list of journals in the CrossRef database
+export const works     = list('works');
+export const funders   = list('funders');
+export const members   = list('members');
+export const types     = list('types');
+export const licenses  = list('licenses');
+export const journals  = list('journals');
 
 // everything in one big ball
 const CrossRef = {
