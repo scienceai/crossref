@@ -58,7 +58,7 @@ used to work with the list, notably with pagination. They differ in their callba
 
 These query the root endpoints from the CrossRef API and return a list. They all take an optional
 `options` object. If it is empty you just list everything, if it is defined it will translate to
-the [API's parameters](https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#parameters).
+the [API's parameters](https://github.com/CrossRef/rest-api-doc#parameters).
 Only minimal process is done to map your JS object to the query string:
 
 * If you have a `query`, it is properly escaped.
@@ -72,7 +72,7 @@ differently for that endpoint, and while we try to make it more consistent we pr
 caught everything yet.
 
 The methods are [documented in the
-API](https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#resource-components):
+API](https://github.com/CrossRef/rest-api-doc#resource-components):
 
 * `CrossRef.works([options], listCB)`
 * `CrossRef.funders([options], listCB)`
@@ -85,7 +85,7 @@ API](https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#resource-c
 
 These methods retrieve a single item for a given key (or return an `Error` if not found). They are
 [documented in the
-API](https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#resource-components-and-identifiers)
+API](https://github.com/CrossRef/rest-api-doc#resource-components-and-identifiers)
 
 * `CrossRef.work(doi, itemCB)`
 * `CrossRef.funder(funderID, itemCB)`
@@ -99,7 +99,7 @@ API](https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#resource-c
 These methods are listing methods, but they list the works that correspond to a given item (e.g.
 the works funded by a given funder). They all take a key like the item methods and optional
 `options`. They are [documented in the
-API](https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#combining-resource-components).
+API](https://github.com/CrossRef/rest-api-doc#combining-resource-components).
 
 * `CrossRef.funderWorks(funderID, [options], listCB)`
 * `CrossRef.prefixWorks(doiPrefix, [options], listCB)`
